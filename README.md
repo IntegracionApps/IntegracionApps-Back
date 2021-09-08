@@ -1,11 +1,19 @@
 # IntegracionApps-Back
 BackEnd del producto de "Supermercado"
 
-Propongo el uso de MONGODB
-Un amigo mío me habló de usarlo.
-Muy fácil de configurar, que es la parte que a mí (Ramiro) me importa.
-Me pasó links de algunos repos suyos para ver en todo caso cómo conecta y todo.
+Necesita las dependencias (a través de  "npm install"):
+  -mongodb
+  -dotenv
+  -express
+  -cors
+
+La dependencia nodedemon debe instalarse globalmente (en una consola, "npm instal -g nodemon")
 
 Las credenciales para acceder a la BD son ->
 username: _integrapps09_
 password: _integrapps4321_
+myFirstDatabase: supermercado
+
+Para ejecutar un servidor nuevo, en consola (NO USAR PowerShell, un tema de seguridad que creo es ajustable impide de ejecutar scripts como nodemon) escribir:
+"nodemon server"
+
