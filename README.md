@@ -10,10 +10,9 @@
   - _dotenv_
   - _express_
   - _cors_
+  - _nodemon_ :bangbang: Debe instalarse **globalmente** (en una consola,  ` npm instal -g nodemon `).
 
-  :bangbang: La dependencia _nodedemon_ debe instalarse **globalmente** (en una consola,  ` npm instal -g nodemon `).
-
-Las credenciales para acceder a la BD son ->
+Las credenciales para acceder a la BD son (reemplazando las siguientes etiquetas que el String de conexión que MongoDB Atlas ofrece en el Pop-Up de conexión ->
   - username: _integrapps09_
   - password: _integrapps4321_
   - myFirstDatabase: supermercado
