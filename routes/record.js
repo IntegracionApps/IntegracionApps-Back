@@ -9,7 +9,7 @@ const recordRoutes = express.Router();
 const dbo = require("../db/conn");
 
 // This section will help you get a list of all the records.
-recordRoutes.route("/record").get(function (req, res) {
+recordRoutes.route("/Products/get/all").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   db_connect
     .collection("Venta")
@@ -20,8 +20,22 @@ recordRoutes.route("/record").get(function (req, res) {
     });
 });
 
+//Obtener un Producto por su ID
+//TODAVÍA NO DEVUELVE RESULTADOS ESPERADOS
+recordRoutes.route("/Products/get/:id").get(function (req, res) {
+  let db_connect = dbo.getDb("supermercado");
+  db_connect
+    .collection("Producto")
+    .find({})
+    .toArray(function (err, result) {
+      if (err) throw err;
+      res.json(result);
+    });
+});
+
+
 // This section will help you create a new record.
-recordRoutes.route("/record/add").post(function (req, res) {
+recordRoutes.route("/add").post(function (req, res) {
   let db_connect = dbo.getDb("employees");
   let myobj = {
     person_name: req.body.person_name,
@@ -53,7 +67,7 @@ recordRoutes.route("/update/:id").post(function (req, res) {
 });
 
 // This section will help you delete a record
-recordRoutes.route("/:id").delete((req, res) => {
+recordRoutes.route("/delete/:id").delete((req, res) => {
   let db_connect = dbo.getDb("employees");
   var myquery = { id: req.body.id };
   db_connect.collection("records").deleteOne(myquery, function (err, obj) {

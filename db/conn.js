@@ -14,7 +14,7 @@ module.exports = {
       if (db)
       {
         _db = db.db("supermercado");
-        console.log("Successfully connected to MongoDB."); 
+        console.log("¡Conexión exitosa a tu cluster de MongoDB!"); 
       }
       return callback(err);
          });
