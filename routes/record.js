@@ -70,31 +70,59 @@ recordRoutes.route("/Users/get/all").get(function (req, res) {
     });
 });
 
-//Obtener un usuario por su ID.
-recordRoutes.route("/Users/get/:id").get(function (req, res) {
+//Obtener un usuario por su E-Mail.
+recordRoutes.route("/Users/get/:email").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
-  let myquery = { id: req.params.id };
+  let myquery = { email: req.params.email };
   db_connect
     .collection("Usuario")
     .find(myquery)
     .toArray(function (err, result) {
       if (err) throw err;
       res.json(result);
+      console.log(result);
     });
-  // console.log(result);
+});
+//-------------
+
+//------VENTAS------
+
+recordRoutes.route("/Sales/get/all").get(function (req, res) {
+  let db_connect = dbo.getDb("supermercado");
+  db_connect
+    .collection("Venta")
+    .find({})
+    .toArray(function (err, result) {
+      if (err) throw err;
+      res.json(result);
+    });
 });
 
 
+//------------
+
 // This section will help you create a new record.
 recordRoutes.route("/add").post(function (req, res) {
-  let db_connect = dbo.getDb("employees");
+  let db_connect = dbo.getDb("supermercado");
+  console.log(req.body);
   let myobj = {
-    person_name: req.body.person_name,
-    person_position: req.body.person_position,
-    person_level: req.body.person_level,
+    //REVISAR
+    id: new Number(),
+    fechaEmision: req.body.values.fechaEmision,
+    cliente: req.body.values.cliente,
+    items: req.body.values.items,
+    subTotal: req.body.values.subTotal,
+    total: req.body.values.total,
+    descuentoTotal: req.body.values.descuentoTotal,
+    medioPago: req.body.values.medioPago,
+    pagoRealizado: req.body.values.pagoRealizado,
+    vuelto: req.body.values.vuelto,
+    estado: req.body.values.estado,
   };
-  db_connect.collection("records").insertOne(myobj, function (err, res) {
+  console.log(myobj);
+  db_connect.collection("Venta").insertOne(myobj, function (err, res) {
     if (err) throw err;
+    console.log(res.status +" "+ res.statusMessage);
   });
 });
 
