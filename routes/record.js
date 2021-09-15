@@ -98,16 +98,13 @@ recordRoutes.route("/Sales/get/all").get(function (req, res) {
     });
 });
 
-
-//------------
-
-// This section will help you create a new record.
+// Crear nueva venta
 recordRoutes.route("/add").post(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
-  console.log(req.body);
+  // console.log(req.body);
   let myobj = {
     //REVISAR
-    id: new Number(),
+    // id: new Number(),
     fechaEmision: req.body.values.fechaEmision,
     cliente: req.body.values.cliente,
     items: req.body.values.items,
@@ -119,12 +116,18 @@ recordRoutes.route("/add").post(function (req, res) {
     vuelto: req.body.values.vuelto,
     estado: req.body.values.estado,
   };
-  console.log(myobj);
+  // console.log(myobj.pagoRealizado);
+  // console.log(myobj.vuelto);
+
   db_connect.collection("Venta").insertOne(myobj, function (err, res) {
     if (err) throw err;
-    console.log(res.status +" "+ res.statusMessage);
+    console.log(res);
   });
+  res.json();
 });
+
+//------------
+
 
 
 
