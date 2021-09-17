@@ -83,6 +83,19 @@ recordRoutes.route("/Users/get/:email").get(function (req, res) {
       console.log(result);
     });
 });
+
+// Borrar un usuario por su ID
+recordRoutes.route("/Users/delete/:id").delete((req, res) => {
+  let db_connect = dbo.getDb("supermercado");
+  var myquery = { id: req.params.id };
+  console.log(myquery.id);
+  db_connect.collection("Usuario").deleteOne(myquery, function (err, obj) {
+    if (err) throw err;
+    console.log("1 document deleted");
+  });
+  res.json();
+});
+
 //-------------
 
 //------VENTAS------
@@ -132,14 +145,5 @@ recordRoutes.route("/add").post(function (req, res) {
 
 
 
-// This section will help you delete a record
-recordRoutes.route("/delete/:id").delete((req, res) => {
-  let db_connect = dbo.getDb("employees");
-  var myquery = { id: req.body.id };
-  db_connect.collection("records").deleteOne(myquery, function (err, obj) {
-    if (err) throw err;
-    console.log("1 document deleted");
-  });
-});
 
 module.exports = recordRoutes;
