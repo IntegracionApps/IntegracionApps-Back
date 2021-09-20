@@ -1,3 +1,4 @@
+const { json } = require("express");
 const express = require("express");
 
 // recordRoutes is an instance of the express router.
@@ -36,10 +37,8 @@ recordRoutes.route("/Products/get/:id").get(function (req, res) {
 
 // Actualizar el stock de un producto según su ID.
 recordRoutes.route("/Products/update/:id").post(function (req, res) {
-  console.log(req.params.id);
-  console.log(req.body.newQuantity);
   let db_connect = dbo.getDb("supermercado");
-  let myquery = { id: req.params.id };
+  let myquery = { id: parseInt(req.params.id) };
   let newvalues = {
     $set: {
       stock: req.body.newQuantity,
@@ -49,7 +48,8 @@ recordRoutes.route("/Products/update/:id").post(function (req, res) {
     .collection("Producto")
     .updateOne(myquery, newvalues, function (err, res) {
       if (err) throw err;
-      console.log("1 document updated");
+      // console.log("1 document updated");
+      // console.log(res);
     });
   res.json(res.status + " " + res.statusMessage);
 });
@@ -71,6 +71,7 @@ recordRoutes.route("/Users/get/all").get(function (req, res) {
 });
 
 //Obtener un usuario por su E-Mail.
+//REVISAR
 recordRoutes.route("/Users/get/:email").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   let myquery = { email: req.params.email };
@@ -88,7 +89,7 @@ recordRoutes.route("/Users/get/:email").get(function (req, res) {
 recordRoutes.route("/Users/delete/:id").delete((req, res) => {
   let db_connect = dbo.getDb("supermercado");
   var myquery = { id: req.params.id };
-  console.log(myquery.id);
+  // console.log(myquery.id);
   db_connect.collection("Usuario").deleteOne(myquery, function (err, obj) {
     if (err) throw err;
     console.log("1 document deleted");
@@ -130,7 +131,26 @@ recordRoutes.route("/add").post(function (req, res) {
     estado: req.body.values.estado,
   };
   // console.log(myobj.pagoRealizado);
-  // console.log(myobj.vuelto);
+  // console.log(myobj.items);
+
+  myobj.items.forEach(item => {
+    // db_connect
+    //   .collection("Producto")
+    //   .find({ id: item.id })
+    //   .toArray(function (err, result) {
+    //     if (err) throw err;
+    //     console.log(result);
+    //     aux = json(result[0]);
+    //     console.log(aux.stock);
+    //   });
+    // console.log(aux.stock);
+    db_connect
+      .collection("Producto")
+      .updateOne({ id: item.id }, { $inc: { stock: -item.quantity } }, function (err, result) {
+        if (err) throw err;
+        console.log("1 document updated.");
+      });
+  });
 
   db_connect.collection("Venta").insertOne(myobj, function (err, res) {
     if (err) throw err;
