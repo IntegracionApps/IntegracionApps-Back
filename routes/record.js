@@ -9,8 +9,23 @@ const recordRoutes = express.Router();
 //"Importamos" el código necesario para conectarse al Clúster de MongoDB Atlas
 const dbo = require("../db/conn");
 
+let idVenta = 0;
+
 //-----PRODUCTOS-----
-// Obtener todos los productos.
+// Obtener todos los productos con stock (para el HOME).
+recordRoutes.route("/Products/get/withStock").get(function (req, res) {
+  let db_connect = dbo.getDb("supermercado");
+  db_connect
+    .collection("Producto")
+    .find({ stock: { $gt: 0 } })
+    .sort({ id: 1 })
+    .toArray(function (err, result) {
+      if (err) throw err;
+      res.json(result);
+    });
+});
+
+// Obtener todos los productos (para el ADMIN).
 recordRoutes.route("/Products/get/all").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   db_connect
@@ -21,6 +36,7 @@ recordRoutes.route("/Products/get/all").get(function (req, res) {
       res.json(result);
     });
 });
+
 
 //Obtener un Producto por su ID
 recordRoutes.route("/Products/get/:id").get(function (req, res) {
@@ -72,16 +88,20 @@ recordRoutes.route("/Users/get/all").get(function (req, res) {
 
 //Obtener un usuario por su E-Mail.
 //REVISAR
-recordRoutes.route("/Users/get/:email").get(function (req, res) {
+recordRoutes.route("/Users/get/:email").post(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   let myquery = { email: req.params.email };
   db_connect
     .collection("Usuario")
-    .find(myquery)
-    .toArray(function (err, result) {
+    .findOne(myquery, function (err, result) {
       if (err) throw err;
-      res.json(result);
-      console.log(result);
+      if (result !== null) {
+        console.log("result.dni: " + result.dni);
+        console.log("password: " + req.body.password);
+        if (result.dni !== req.body.password) res.json(false);
+        else res.json(result);
+      }
+      else res.status(404).json("No está registrado ningún usuario con el mail: " + req.params.email);
     });
 });
 
@@ -101,26 +121,48 @@ recordRoutes.route("/Users/delete/:id").delete((req, res) => {
 
 //------VENTAS------
 
+recordRoutes.route("/Sales/get/count").get(function (req, res) {
+  let db_connect = dbo.getDb("supermercado");
+  db_connect.collection("Venta").countDocuments(function (err, result) {
+    if (err) throw err;
+    idVenta = result;
+  })
+  res.json();
+});
+
 recordRoutes.route("/Sales/get/all").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   db_connect
     .collection("Venta")
     .find({})
+    .sort({ id: 1 })
     .toArray(function (err, result) {
       if (err) throw err;
       res.json(result);
     });
 });
 
+
 // Crear nueva venta
 recordRoutes.route("/add").post(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
-  // console.log(req.body);
+  console.log(req.body.count);
   let myobj = {
     //REVISAR
-    // id: new Number(),
+    // _id: req.body.countSales + 1,
     fechaEmision: req.body.values.fechaEmision,
-    cliente: req.body.values.cliente,
+    cliente: {
+      nombre: req.body.values.name,
+      apellido: req.body.values.lastName,
+      ubicación:{
+        dirección: req.body.values.address,
+        altura: req.body.values.height,
+        piso: req.body.values.floor,
+      },
+      DNI: req.body.values.dni,
+      email: req.body.values.email,
+      teléfono: req.body.values.phone,
+    },
     items: req.body.values.items,
     subTotal: req.body.values.subTotal,
     total: req.body.values.total,
@@ -129,20 +171,23 @@ recordRoutes.route("/add").post(function (req, res) {
     pagoRealizado: req.body.values.pagoRealizado,
     vuelto: req.body.values.vuelto,
     estado: req.body.values.estado,
+    sucursal: req.body.values.sucursal,
+    otros1: req.body.values.otros1,
+    otros2: req.body.values.otros2,
   };
   // console.log(myobj.pagoRealizado);
-  // console.log(myobj.items);
+  // console.log(myobj);
 
   myobj.items.forEach(item => {
-    // db_connect
-    //   .collection("Producto")
-    //   .find({ id: item.id })
-    //   .toArray(function (err, result) {
-    //     if (err) throw err;
-    //     console.log(result);
-    //     aux = json(result[0]);
-    //     console.log(aux.stock);
-    //   });
+    db_connect
+      .collection("Producto")
+      .find({ id: item.id })
+      .toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        aux = json(result[0]);
+        console.log(aux.stock);
+      });
     // console.log(aux.stock);
     db_connect
       .collection("Producto")
@@ -159,8 +204,19 @@ recordRoutes.route("/add").post(function (req, res) {
   res.json();
 });
 
+
 //------------
 
+//------SUPERMERCADO------
+recordRoutes.route("/Markets/get/all").get(function (req, res) {
+  let db_connect = dbo.getDb("supermercado");
+  db_connect
+    .collection("Supermercado")
+    .findOne({}, {$project: {_id: 0}},function (err, result) {
+      if (err) throw err;
+      res.json(result);
+    });
+});
 
 
 
