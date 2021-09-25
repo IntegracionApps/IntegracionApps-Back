@@ -76,10 +76,24 @@ recordRoutes.route("/Products/update/:id").post(function (req, res) {
 //Obtener todos los EMPLEADOS ACTIVOS
 recordRoutes.route("/Users/get/all").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
-  // let myquery = { disponible: "si" }
+  let myquery = {
+    $and: [
+      {
+        disponible: true
+      }, {
+        $or: [
+          {
+            rol: 'Empleado'
+          }, {
+            rol: 'Administrador'
+          }
+        ]
+      }
+    ]
+  }
   db_connect
     .collection("Usuario")
-    .find({ disponible: "si" })
+    .find(myquery)
     .toArray(function (err, result) {
       if (err) throw err;
       res.json(result);
@@ -88,20 +102,18 @@ recordRoutes.route("/Users/get/all").get(function (req, res) {
 
 //Obtener un usuario por su E-Mail.
 //REVISAR
-recordRoutes.route("/Users/get/:email").post(function (req, res) {
+recordRoutes.route("/Users/get/").post(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
-  let myquery = { email: req.params.email };
+  let myquery = { email: req.body.cliente.email };
   db_connect
     .collection("Usuario")
     .findOne(myquery, function (err, result) {
       if (err) throw err;
       if (result !== null) {
-        console.log("result.dni: " + result.dni);
-        console.log("password: " + req.body.password);
-        if (result.dni !== req.body.password) res.json(false);
+        if (result.password !== req.body.cliente.password) res.json(false);
         else res.json(result);
       }
-      else res.status(404).json("No está registrado ningún usuario con el mail: " + req.params.email);
+      else res.status(404).json("No está registrado ningún usuario con el mail: " + req.body.cliente.email);
     });
 });
 
@@ -115,6 +127,56 @@ recordRoutes.route("/Users/delete/:id").delete((req, res) => {
     console.log("1 document deleted");
   });
   res.json();
+});
+
+//Crear un nuevo CLIENTE
+recordRoutes.route("/Users/add/client").post((req, res) => {
+  let db_connect = dbo.getDb("supermercado");
+  let myobj = {
+    dni: req.body.cliente.dni,
+    cuil: req.body.cliente.cuil,
+    nombre: req.body.cliente.name,
+    apellido: req.body.cliente.lastName,
+    email: req.body.cliente.email,
+    ubicación: {
+      address: req.body.cliente.address,
+      height: req.body.cliente.height,
+      floor: req.body.cliente.floor,
+    },
+    teléfono: req.body.cliente.phone,
+    rol: 'Cliente',
+    disponible: true,
+  }
+
+  db_connect.collection("Usuario").insertOne(myobj, function (err, result) {
+    if (err) throw err;
+    res.status(200).json("¡Has sido registrado exitosamente!")
+  })
+});
+
+recordRoutes.route("/Users/add/employee").post((req, res) => {
+  let db_connect = dbo.getDb("supermercado");
+  let myobj = {
+    dni: req.body.cliente.dni,
+    cuil: req.body.cliente.cuil,
+    nombre: req.body.cliente.name,
+    apellido: req.body.cliente.lastName,
+    email: req.body.cliente.email,
+    ubicación: {
+      address: req.body.cliente.address,
+      height: req.body.cliente.height,
+      floor: req.body.cliente.floor,
+    },
+    teléfono: req.body.cliente.phone,
+    rol: req.body.cliente.rol,
+    salario: req.body.cliente.salario,
+    disponible: true,
+  }
+
+  db_connect.collection("Usuario").insertOne(myobj, function (err, result) {
+    if (err) throw err;
+    res.status(200).json("¡Has sido registrado exitosamente!")
+  })
 });
 
 //-------------
@@ -154,7 +216,7 @@ recordRoutes.route("/add").post(function (req, res) {
     cliente: {
       nombre: req.body.values.name,
       apellido: req.body.values.lastName,
-      ubicación:{
+      ubicación: {
         dirección: req.body.values.address,
         altura: req.body.values.height,
         piso: req.body.values.floor,
@@ -212,7 +274,7 @@ recordRoutes.route("/Markets/get/all").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   db_connect
     .collection("Supermercado")
-    .findOne({}, {$project: {_id: 0}},function (err, result) {
+    .findOne({}, { $project: { _id: 0 } }, function (err, result) {
       if (err) throw err;
       res.json(result);
     });
