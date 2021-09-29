@@ -1,3 +1,4 @@
+const { Double, Int32 } = require("bson");
 const { json } = require("express");
 const express = require("express");
 
@@ -37,6 +38,25 @@ recordRoutes.route("/Products/get/all").get(function (req, res) {
     });
 });
 
+recordRoutes.route("/Products/add/").post((req, res) => {
+  let db_connect = dbo.getDb("supermercado");
+  let myobj = {
+    nombre: req.body.producto.nombre,
+    descrip: req.body.producto.descripcion,
+    categoria: req.body.producto.categoria,
+    tipoUnidad: req.body.producto.tipoUnidad,
+    price: new Double(parseFloat(req.body.producto.price)),
+    stock: new Int32(parseInt(req.body.producto.stock)),
+    puntoRepo: new Int32(parseInt(req.body.producto.puntoRepo)),
+  }
+
+  db_connect.collection("Producto").insertOne(myobj, function (err, result) {
+    if (err) throw err;
+    res.status(200).json("Se ha creado el producto exitosamente!")
+  });
+});
+
+
 
 //Obtener un Producto por su ID
 recordRoutes.route("/Products/get/:id").get(function (req, res) {
@@ -50,6 +70,33 @@ recordRoutes.route("/Products/get/:id").get(function (req, res) {
       res.json(result);
     });
 });
+
+recordRoutes.route("/Products/update").post(function (req, res) {
+  console.log("IN");
+  let db_connect = dbo.getDb("supermercado");
+  let myquery = { descrip: req.body.producto.descrip };
+  let newvalues = {
+    $set: {
+      // id: req.body.producto.id,
+      nombre: req.body.producto.nombre,
+      descrip: req.body.producto.descrip,
+      categoria: req.body.producto.categoria,
+      tipoUnidad: req.body.producto.tipoUnidad,
+      price: new Double(parseFloat(req.body.producto.price)),
+      stock: new Int32(parseInt(req.body.producto.stock)),
+      puntoRepo: new Int32(parseInt(req.body.producto.puntoRepo)),
+    },
+  };
+  db_connect
+    .collection("Producto")
+    .updateOne(myquery, newvalues, function (err, res) {
+      if (err) throw err;
+      // console.log("1 document updated");
+      // console.log(res);
+    });
+  res.json(res.status + " " + res.statusMessage);
+});
+
 
 // Actualizar el stock de un producto según su ID.
 recordRoutes.route("/Products/update/:id").post(function (req, res) {
@@ -69,6 +116,25 @@ recordRoutes.route("/Products/update/:id").post(function (req, res) {
     });
   res.json(res.status + " " + res.statusMessage);
 });
+
+
+recordRoutes.route("/Products/delete/:id").post(function (req, res) {
+  console.log(req.params);
+  let db_connect = dbo.getDb("supermercado");
+  let myquery = {
+    id: parseInt(req.params.id),
+  }
+  db_connect
+    .collection("Producto")
+    .deleteOne(myquery, function (err, result) {
+      if (err) throw err;
+      console.log(result);
+      if (result.deletedCount >= 1) res.status(200).json("Se ha eliminado el producto con éxito.")
+      else res.status(200).json("No se ha encontrado un producto con el ID: " + req.params.id)
+      res.status(result);
+    });
+});
+
 
 //-------------
 
@@ -111,22 +177,41 @@ recordRoutes.route("/Users/get/").post(function (req, res) {
       if (err) throw err;
       if (result !== null) {
         if (result.password !== req.body.cliente.password) res.json(false);
-        else res.json(result);
+        else {
+          const user = {
+            nombre: result.nombre,
+            apellido: result.apellido,
+            ubicacion: {
+              direccion: result.ubicacion.direccion,
+              altura: result.ubicacion.altura,
+              piso: result.ubicacion.piso,
+            },
+            email: result.email,
+            dni: result.dni,
+            telefono: result.telefono,
+            rol: result.rol,
+          }
+          res.json(user);
+        };
       }
       else res.status(404).json("No está registrado ningún usuario con el mail: " + req.body.cliente.email);
     });
 });
 
 // Borrar un usuario por su ID
-recordRoutes.route("/Users/delete/:id").delete((req, res) => {
+recordRoutes.route("/Users/delete/:id").post((req, res) => {
   let db_connect = dbo.getDb("supermercado");
-  var myquery = { id: req.params.id };
+  // console.log(typeof(req.params.id));
+  var myquery = { id: parseInt(req.params.id) };
+  let newvalues = {
+    $set: { disponible: false },
+  }
   // console.log(myquery.id);
-  db_connect.collection("Usuario").deleteOne(myquery, function (err, obj) {
+  db_connect.collection("Usuario").updateOne(myquery, newvalues, function (err, obj) {
     if (err) throw err;
     console.log("1 document deleted");
   });
-  res.json();
+  res.status(200).json("La baja se ha realizado con éxito!")
 });
 
 //Crear un nuevo CLIENTE
@@ -135,15 +220,15 @@ recordRoutes.route("/Users/add/client").post((req, res) => {
   let myobj = {
     dni: req.body.cliente.dni,
     cuil: req.body.cliente.cuil,
-    nombre: req.body.cliente.name,
-    apellido: req.body.cliente.lastName,
+    nombre: req.body.cliente.nombre,
+    apellido: req.body.cliente.apellido,
     email: req.body.cliente.email,
-    ubicación: {
-      address: req.body.cliente.address,
-      height: req.body.cliente.height,
-      floor: req.body.cliente.floor,
+    ubicacion: {
+      direccion: req.body.cliente.direccion,
+      altura: req.body.cliente.altura,
+      piso: req.body.cliente.piso,
     },
-    teléfono: req.body.cliente.phone,
+    telefono: req.body.cliente.telefono,
     rol: 'Cliente',
     disponible: true,
   }
@@ -154,20 +239,21 @@ recordRoutes.route("/Users/add/client").post((req, res) => {
   })
 });
 
+//Crear un nuevo EMPLEADO o ADMINISTRADOR
 recordRoutes.route("/Users/add/employee").post((req, res) => {
   let db_connect = dbo.getDb("supermercado");
   let myobj = {
     dni: req.body.cliente.dni,
     cuil: req.body.cliente.cuil,
-    nombre: req.body.cliente.name,
-    apellido: req.body.cliente.lastName,
+    nombre: req.body.cliente.nombre,
+    apellido: req.body.cliente.apellido,
     email: req.body.cliente.email,
     ubicación: {
-      address: req.body.cliente.address,
-      height: req.body.cliente.height,
-      floor: req.body.cliente.floor,
+      direccion: req.body.cliente.direccion,
+      altura: req.body.cliente.altura,
+      piso: req.body.cliente.piso,
     },
-    teléfono: req.body.cliente.phone,
+    teléfono: req.body.cliente.telefono,
     rol: req.body.cliente.rol,
     salario: req.body.cliente.salario,
     disponible: true,
@@ -179,29 +265,62 @@ recordRoutes.route("/Users/add/employee").post((req, res) => {
   })
 });
 
+//Editar un EMPLEADO/ADMINISTRADOR
+recordRoutes.route("/Users/edit/employee").post((req, res) => {
+  let db_connect = dbo.getDb("supermercado");
+  console.log(req.body);
+  let myquery = {
+    id: req.body.empleado.id,
+  }
+  let newvalues = {
+    $set: {
+      email: req.body.empleado.email,
+      ubicacion: {
+        direccion: req.body.empleado.ubicacion.direccion,
+        altura: req.body.empleado.ubicacion.altura,
+        piso: req.body.empleado.ubicacion.piso,
+      },
+      telefono: req.body.empleado.telefono,
+      salario: new Double(parseFloat(req.body.empleado.salario)),
+    }
+  }
+  db_connect.collection("Usuario").updateOne(myquery, newvalues, function (err, result) {
+    if (err) throw err;
+    res.status(200).json("¡Has sido modificado exitosamente!")
+  })
+});
+
+
 //-------------
 
 //------VENTAS------
 
-recordRoutes.route("/Sales/get/count").get(function (req, res) {
+//Buscar todas las ventas
+recordRoutes.route("/Sales/get/:salesSelect").get(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
-  db_connect.collection("Venta").countDocuments(function (err, result) {
-    if (err) throw err;
-    idVenta = result;
-  })
-  res.json();
-});
+  if (req.params.salesSelect === "0") {
+    db_connect
+      .collection("Venta")
+      .find({})
+      .sort({ id: 1 })
+      .toArray(function (err, result) {
+        if (err) throw err;
+        res.json(result);
+      });
+  } else {
+    let myquery = {
+      "cliente.dni": req.params.salesSelect
+    };
+    db_connect
+      .collection("Venta")
+      .find(myquery)
+      .sort({ id: 1 })
+      .toArray(function (err, result) {
+        if (err) throw err;
+        res.json(result);
+      });
 
-recordRoutes.route("/Sales/get/all").get(function (req, res) {
-  let db_connect = dbo.getDb("supermercado");
-  db_connect
-    .collection("Venta")
-    .find({})
-    .sort({ id: 1 })
-    .toArray(function (err, result) {
-      if (err) throw err;
-      res.json(result);
-    });
+  }
 });
 
 
@@ -214,16 +333,16 @@ recordRoutes.route("/add").post(function (req, res) {
     // _id: req.body.countSales + 1,
     fechaEmision: req.body.values.fechaEmision,
     cliente: {
-      nombre: req.body.values.name,
-      apellido: req.body.values.lastName,
-      ubicación: {
-        dirección: req.body.values.address,
-        altura: req.body.values.height,
-        piso: req.body.values.floor,
+      nombre: req.body.values.nombre,
+      apellido: req.body.values.apellido,
+      ubicacion: {
+        direccion: req.body.values.direccion,
+        altura: req.body.values.altura,
+        piso: req.body.values.piso,
       },
       DNI: req.body.values.dni,
       email: req.body.values.email,
-      teléfono: req.body.values.phone,
+      telefono: req.body.values.telefono,
     },
     items: req.body.values.items,
     subTotal: req.body.values.subTotal,
