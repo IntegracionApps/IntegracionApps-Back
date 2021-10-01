@@ -1,4 +1,4 @@
-const { Double, Int32 } = require("bson");
+const { Double, Int32, ObjectId } = require("bson");
 const { json } = require("express");
 const express = require("express");
 
@@ -393,9 +393,9 @@ recordRoutes.route("/add").post(function (req, res) {
       .find({ id: item.id })
       .toArray(function (err, result) {
         if (err) throw err;
-        console.log(result);
+        // console.log(result);
         aux = json(result[0]);
-        console.log(aux.stock);
+        // console.log(aux.stock);
       });
     // console.log(aux.stock);
     db_connect
@@ -406,13 +406,44 @@ recordRoutes.route("/add").post(function (req, res) {
       });
   });
 
-  db_connect.collection("Venta").insertOne(myobj, function (err, res) {
+  db_connect.collection("Venta").insertOne(myobj, function (err, resultado) {
     if (err) throw err;
-    console.log(res);
+    res.json(resultado);
+    console.log(resultado)
   });
-  res.json();
+  // res.json();
 });
 
+//Obtener el código de compra de la venta más reciente
+recordRoutes.route("/obtenerCodigo").get(function (req, res) {
+  console.log("IN");
+  let db_connect = dbo.getDb("supermercado");
+  db_connect.collection("Venta")
+    .findOne({}, { projection: { '_id': 1 }, sort: { '_id': -1 } }, function (err, result) {
+      console.log(result._id);
+      const aEnviar = new ObjectId(result._id).toHexString();
+      console.log(aEnviar)
+      if (err) throw err;
+      res.json(aEnviar);
+    });
+});
+
+recordRoutes.route("/Sales/confirm").post(function (req, res) {
+  let db_connect = dbo.getDb("supermercado");
+  console.log(req.body.id);
+  let myquery = { _id: new ObjectId(req.body.id) }
+  let newvalues = {
+    $set: {
+      estado: "Pagado",
+    }
+  }
+  db_connect.collection("Venta")
+    .updateOne(myquery, newvalues, function (err, result) {
+      if (err) throw err;
+      res.json();
+    })
+
+});
 
 //------------
 
