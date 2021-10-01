@@ -429,8 +429,8 @@ recordRoutes.route("/obtenerCodigo").get(function (req, res) {
 });
 
 recordRoutes.route("/Sales/confirm").post(function (req, res) {
-  let db_connect = dbo.getDb("supermercado");
   console.log(req.body.id);
+  let db_connect = dbo.getDb("supermercado");
   let myquery = { _id: new ObjectId(req.body.id) }
   let newvalues = {
     $set: {
