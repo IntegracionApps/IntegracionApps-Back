@@ -229,7 +229,9 @@ recordRoutes.route("/Users/add/client").post((req, res) => {
       piso: req.body.cliente.piso,
     },
     telefono: req.body.cliente.telefono,
+    password: req.body.cliente.password,
     rol: 'Cliente',
+    salario: new Int32(0),
     disponible: true,
   }
 
@@ -248,13 +250,14 @@ recordRoutes.route("/Users/add/employee").post((req, res) => {
     nombre: req.body.cliente.nombre,
     apellido: req.body.cliente.apellido,
     email: req.body.cliente.email,
-    ubicación: {
+    ubicacion: {
       direccion: req.body.cliente.direccion,
       altura: req.body.cliente.altura,
       piso: req.body.cliente.piso,
     },
-    teléfono: req.body.cliente.telefono,
+    telefono: req.body.cliente.telefono,
     rol: req.body.cliente.rol,
+    password: req.body.cliente.password,
     salario: req.body.cliente.salario,
     disponible: true,
   }
@@ -264,6 +267,31 @@ recordRoutes.route("/Users/add/employee").post((req, res) => {
     res.status(200).json("¡Has sido registrado exitosamente!")
   })
 });
+
+//Editar un CLIENTE
+recordRoutes.route("/Users/edit/client").post((req, res) => {
+  let db_connect = dbo.getDb("supermercado");
+  console.log(req.body);
+  let myquery = {
+    dni: req.body.cliente.dni,
+  }
+  let newvalues = {
+    $set: {
+      email: req.body.cliente.email,
+      ubicacion: {
+        direccion: req.body.cliente.direccion,
+        altura: req.body.cliente.altura,
+        piso: req.body.cliente.piso,
+      },
+      telefono: req.body.cliente.telefono,
+    }
+  }
+  db_connect.collection("Usuario").updateOne(myquery, newvalues, function (err, result) {
+    if (err) throw err;
+    res.status(200).json("¡Has sido modificado exitosamente!")
+  })
+});
+
 
 //Editar un EMPLEADO/ADMINISTRADOR
 recordRoutes.route("/Users/edit/employee").post((req, res) => {
@@ -340,7 +368,7 @@ recordRoutes.route("/add").post(function (req, res) {
         altura: req.body.values.altura,
         piso: req.body.values.piso,
       },
-      DNI: req.body.values.dni,
+      dni: req.body.values.dni,
       email: req.body.values.email,
       telefono: req.body.values.telefono,
     },
