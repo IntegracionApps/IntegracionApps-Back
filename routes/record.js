@@ -152,7 +152,9 @@ recordRoutes.route("/Users/get/all").get(function (req, res) {
             rol: 'Empleado'
           }, {
             rol: 'Administrador'
-          }
+          }, { 
+            rol: 'Finanzas' 
+          },
         ]
       }
     ]
