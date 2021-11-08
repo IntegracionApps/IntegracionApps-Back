@@ -358,6 +358,17 @@ recordRoutes.route("/Sales/get/:salesSelect").get(function (req, res) {
 recordRoutes.route("/add").post(function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   console.log(req.body.count);
+  var paymentMethod="";
+  switch (parseInt(req.body.values.medioPago)){
+    case 1: paymentMethod="Efectivo"
+    break;
+    case 2: paymentMethod="Tarjeta de Crédito 'Entidad A'"
+    break;
+    case 3: paymentMethod="Tarjeta de Crédito 'Entidad B'"
+    break;
+    case 4: paymentMethod="Débito"
+    break;
+  }
   let myobj = {
     //REVISAR
     // _id: req.body.countSales + 1,
@@ -378,7 +389,7 @@ recordRoutes.route("/add").post(function (req, res) {
     subTotal: req.body.values.subTotal,
     total: req.body.values.total,
     descuentoTotal: req.body.values.descuentoTotal,
-    medioPago: req.body.values.medioPago,
+    medioPago: paymentMethod,
     pagoRealizado: req.body.values.pagoRealizado,
     vuelto: req.body.values.vuelto,
     estado: req.body.values.estado,
@@ -387,32 +398,32 @@ recordRoutes.route("/add").post(function (req, res) {
     otros2: req.body.values.otros2,
   };
   // console.log(myobj.pagoRealizado);
-  // console.log(myobj);
+  console.log(myobj);
 
-  myobj.items.forEach(item => {
-    db_connect
-      .collection("Producto")
-      .find({ id: item.id })
-      .toArray(function (err, result) {
-        if (err) throw err;
-        // console.log(result);
-        aux = json(result[0]);
-        // console.log(aux.stock);
-      });
-    // console.log(aux.stock);
-    db_connect
-      .collection("Producto")
-      .updateOne({ id: item.id }, { $inc: { stock: -item.quantity } }, function (err, result) {
-        if (err) throw err;
-        console.log("1 document updated.");
-      });
-  });
+  // myobj.items.forEach(item => {
+  //   db_connect
+  //     .collection("Producto")
+  //     .find({ id: item.id })
+  //     .toArray(function (err, result) {
+  //       if (err) throw err;
+  //       // console.log(result);
+  //       aux = json(result[0]);
+  //       // console.log(aux.stock);
+  //     });
+  //   // console.log(aux.stock);
+  //   db_connect
+  //     .collection("Producto")
+  //     .updateOne({ id: item.id }, { $inc: { stock: -item.quantity } }, function (err, result) {
+  //       if (err) throw err;
+  //       console.log("1 document updated.");
+  //     });
+  // });
 
-  db_connect.collection("Venta").insertOne(myobj, function (err, resultado) {
-    if (err) throw err;
-    res.json(resultado);
-    console.log(resultado)
-  });
+  // db_connect.collection("Venta").insertOne(myobj, function (err, resultado) {
+  //   if (err) throw err;
+  //   res.json(resultado);
+  //   console.log(resultado)
+  // });
   // res.json();
 });
 
