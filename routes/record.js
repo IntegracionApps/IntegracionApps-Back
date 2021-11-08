@@ -397,34 +397,34 @@ recordRoutes.route("/add").post(function (req, res) {
     otros1: req.body.values.otros1,
     otros2: req.body.values.otros2,
   };
-  // console.log(myobj.pagoRealizado);
+  console.log(myobj.pagoRealizado);
   console.log(myobj);
 
-  // myobj.items.forEach(item => {
-  //   db_connect
-  //     .collection("Producto")
-  //     .find({ id: item.id })
-  //     .toArray(function (err, result) {
-  //       if (err) throw err;
-  //       // console.log(result);
-  //       aux = json(result[0]);
-  //       // console.log(aux.stock);
-  //     });
-  //   // console.log(aux.stock);
-  //   db_connect
-  //     .collection("Producto")
-  //     .updateOne({ id: item.id }, { $inc: { stock: -item.quantity } }, function (err, result) {
-  //       if (err) throw err;
-  //       console.log("1 document updated.");
-  //     });
-  // });
+  myobj.items.forEach(item => {
+    db_connect
+      .collection("Producto")
+      .find({ id: item.id })
+      .toArray(function (err, result) {
+        if (err) throw err;
+        // console.log(result);
+        aux = json(result[0]);
+        // console.log(aux.stock);
+      });
+    // console.log(aux.stock);
+    db_connect
+      .collection("Producto")
+      .updateOne({ id: item.id }, { $inc: { stock: -item.quantity } }, function (err, result) {
+        if (err) throw err;
+        console.log("1 document updated.");
+      });
+  });
 
-  // db_connect.collection("Venta").insertOne(myobj, function (err, resultado) {
-  //   if (err) throw err;
-  //   res.json(resultado);
-  //   console.log(resultado)
-  // });
-  // res.json();
+  db_connect.collection("Venta").insertOne(myobj, function (err, resultado) {
+    if (err) throw err;
+    res.json(resultado);
+    console.log(resultado)
+  });
+  res.json();
 });
 
 //Obtener el código de compra de la venta más reciente
