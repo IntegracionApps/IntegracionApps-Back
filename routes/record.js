@@ -10,7 +10,7 @@ const recordRoutes = express.Router();
 //"Importamos" el código necesario para conectarse al Clúster de MongoDB Atlas
 const dbo = require("../db/conn");
 
-let idVenta = 0;
+// let idVenta = 0;
 
 //-----PRODUCTOS-----
 // Obtener todos los productos con stock (para el HOME).
