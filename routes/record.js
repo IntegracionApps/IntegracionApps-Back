@@ -424,7 +424,8 @@ recordRoutes.route("/add").post( function (req, res) {
     res.json(resultado);
     console.log(resultado)
   });
-  res.json();
+  /* res.json();*/
+
 });
 
 //Obtener el código de compra de la venta más reciente
