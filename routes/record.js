@@ -439,8 +439,8 @@ recordRoutes.route("/obtenerCodigo").get( function (req, res) {
       aEnviar = new ObjectId(result._id).toHexString();
       console.log(aEnviar)
       if (err) throw err;
+      res.json(aEnviar);
     });
-    res.json(aEnviar);
 
 });
 
