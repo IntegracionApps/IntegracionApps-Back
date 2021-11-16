@@ -428,19 +428,20 @@ recordRoutes.route("/add").post( function (req, res) {
 });
 
 //Obtener el código de compra de la venta más reciente
-recordRoutes.route("/obtenerCodigo").get( function (req, res) {
+recordRoutes.route("/obtenerCodigo").get(function (req, res) {
   console.log("IN");
-  let aEnviar= '';
   let db_connect = dbo.getDb("supermercado");
   db_connect.collection("Venta")
-    .findOne({}, { projection: { '_id': 1 }, sort: { '_id': -1 } }, function (err, result) {
+    .findOne({}, { projection: { '_id': 1 }, sort: { '_id': -1 } }, async function (err, result) {
       console.log(result._id);
-      aEnviar = new ObjectId(result._id).toHexString();
-      console.log(aEnviar)
-      if (err) throw err;
+      try {
+        let aEnviar = await new ObjectId(result._id).toHexString();
+        console.log(aEnviar)
+        res.json(aEnviar);
+      } catch (err) {
+        throw err;
+      }
     });
-    if(aEnviar.length() !== 0) res.json(aEnviar);
-
 });
 
 recordRoutes.route("/Sales/confirm").post( function (req, res) {
