@@ -439,7 +439,8 @@ recordRoutes.route("/obtenerCodigo").get(cors(), function (req, res) {
       console.log(aEnviar)
       if (err) throw err;
     });
-    res.json(aEnviar);
+    if(aEnviar.length() !== 0) res.json(aEnviar);
+
 });
 
 recordRoutes.route("/Sales/confirm").post(cors(), function (req, res) {
