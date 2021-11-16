@@ -14,7 +14,7 @@ const dbo = require("../db/conn");
 
 //-----PRODUCTOS-----
 // Obtener todos los productos con stock (para el HOME).
-recordRoutes.route("/Products/get/withStock").get(cors(), function (req, res) {
+recordRoutes.route("/Products/get/withStock").get( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   db_connect
     .collection("Producto")
@@ -27,7 +27,7 @@ recordRoutes.route("/Products/get/withStock").get(cors(), function (req, res) {
 });
 
 // Obtener todos los productos (para el ADMIN).
-recordRoutes.route("/Products/get/all").get(cors(), function (req, res) {
+recordRoutes.route("/Products/get/all").get( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   db_connect
     .collection("Producto")
@@ -38,7 +38,7 @@ recordRoutes.route("/Products/get/all").get(cors(), function (req, res) {
     });
 });
 
-recordRoutes.route("/Products/add/").post(cors(), (req, res) => {
+recordRoutes.route("/Products/add/").post( (req, res) => {
   let db_connect = dbo.getDb("supermercado");
   let myobj = {
     nombre: req.body.producto.nombre,
@@ -59,7 +59,7 @@ recordRoutes.route("/Products/add/").post(cors(), (req, res) => {
 
 
 //Obtener un Producto por su ID
-recordRoutes.route("/Products/get/:id").get(cors(), function (req, res) {
+recordRoutes.route("/Products/get/:id").get( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   let myquery = { id: req.params.id };
   db_connect
@@ -71,7 +71,7 @@ recordRoutes.route("/Products/get/:id").get(cors(), function (req, res) {
     });
 });
 
-recordRoutes.route("/Products/update").post(cors(), function (req, res) {
+recordRoutes.route("/Products/update").post( function (req, res) {
   console.log("IN");
   let db_connect = dbo.getDb("supermercado");
   let myquery = { descrip: req.body.producto.descrip };
@@ -99,7 +99,7 @@ recordRoutes.route("/Products/update").post(cors(), function (req, res) {
 
 
 // Actualizar el stock de un producto según su ID.
-recordRoutes.route("/Products/update/:id").post(cors(), function (req, res) {
+recordRoutes.route("/Products/update/:id").post( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   let myquery = { id: parseInt(req.params.id) };
   let newvalues = {
@@ -118,7 +118,7 @@ recordRoutes.route("/Products/update/:id").post(cors(), function (req, res) {
 });
 
 
-recordRoutes.route("/Products/delete/:id").post(cors(), function (req, res) {
+recordRoutes.route("/Products/delete/:id").post( function (req, res) {
   console.log(req.params);
   let db_connect = dbo.getDb("supermercado");
   let myquery = {
@@ -140,7 +140,7 @@ recordRoutes.route("/Products/delete/:id").post(cors(), function (req, res) {
 
 //------USUARIOS------
 //Obtener todos los EMPLEADOS ACTIVOS
-recordRoutes.route("/Users/get/all").get(cors(), function (req, res) {
+recordRoutes.route("/Users/get/all").get( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   let myquery = {
     $and: [
@@ -170,7 +170,7 @@ recordRoutes.route("/Users/get/all").get(cors(), function (req, res) {
 
 //Obtener un usuario por su E-Mail.
 //REVISAR
-recordRoutes.route("/Users/get/").post(cors(), function (req, res) {
+recordRoutes.route("/Users/get/").post( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   let myquery = { email: req.body.cliente.email };
   db_connect
@@ -201,7 +201,7 @@ recordRoutes.route("/Users/get/").post(cors(), function (req, res) {
 });
 
 // Borrar un usuario por su ID
-recordRoutes.route("/Users/delete/:id").post(cors(), (req, res) => {
+recordRoutes.route("/Users/delete/:id").post( (req, res) => {
   let db_connect = dbo.getDb("supermercado");
   // console.log(typeof(req.params.id));
   var myquery = { id: parseInt(req.params.id) };
@@ -217,7 +217,7 @@ recordRoutes.route("/Users/delete/:id").post(cors(), (req, res) => {
 });
 
 //Crear un nuevo CLIENTE
-recordRoutes.route("/Users/add/client").post(cors(), (req, res) => {
+recordRoutes.route("/Users/add/client").post( (req, res) => {
   let db_connect = dbo.getDb("supermercado");
   let myobj = {
     dni: req.body.cliente.dni,
@@ -244,7 +244,7 @@ recordRoutes.route("/Users/add/client").post(cors(), (req, res) => {
 });
 
 //Crear un nuevo EMPLEADO o ADMINISTRADOR
-recordRoutes.route("/Users/add/employee").post(cors(), (req, res) => {
+recordRoutes.route("/Users/add/employee").post( (req, res) => {
   let db_connect = dbo.getDb("supermercado");
   let myobj = {
     dni: req.body.cliente.dni,
@@ -271,7 +271,7 @@ recordRoutes.route("/Users/add/employee").post(cors(), (req, res) => {
 });
 
 //Editar un CLIENTE
-recordRoutes.route("/Users/edit/client").post(cors(), (req, res) => {
+recordRoutes.route("/Users/edit/client").post( (req, res) => {
   let db_connect = dbo.getDb("supermercado");
   console.log(req.body);
   let myquery = {
@@ -296,7 +296,7 @@ recordRoutes.route("/Users/edit/client").post(cors(), (req, res) => {
 
 
 //Editar un EMPLEADO/ADMINISTRADOR
-recordRoutes.route("/Users/edit/employee").post(cors(), (req, res) => {
+recordRoutes.route("/Users/edit/employee").post( (req, res) => {
   let db_connect = dbo.getDb("supermercado");
   console.log(req.body);
   let myquery = {
@@ -326,7 +326,7 @@ recordRoutes.route("/Users/edit/employee").post(cors(), (req, res) => {
 //------VENTAS------
 
 //Buscar todas las ventas
-recordRoutes.route("/Sales/get/:salesSelect").get(cors(), function (req, res) {
+recordRoutes.route("/Sales/get/:salesSelect").get( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   if (req.params.salesSelect === "0") {
     db_connect
@@ -355,7 +355,7 @@ recordRoutes.route("/Sales/get/:salesSelect").get(cors(), function (req, res) {
 
 
 // Crear nueva venta
-recordRoutes.route("/add").post(cors(), function (req, res) {
+recordRoutes.route("/add").post( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   console.log(req.body.count);
   var paymentMethod="";
@@ -428,7 +428,7 @@ recordRoutes.route("/add").post(cors(), function (req, res) {
 });
 
 //Obtener el código de compra de la venta más reciente
-recordRoutes.route("/obtenerCodigo").get(cors(), function (req, res) {
+recordRoutes.route("/obtenerCodigo").get( function (req, res) {
   console.log("IN");
   let aEnviar= '';
   let db_connect = dbo.getDb("supermercado");
@@ -443,7 +443,7 @@ recordRoutes.route("/obtenerCodigo").get(cors(), function (req, res) {
 
 });
 
-recordRoutes.route("/Sales/confirm").post(cors(), function (req, res) {
+recordRoutes.route("/Sales/confirm").post( function (req, res) {
   console.log(req.body.id);
   let db_connect = dbo.getDb("supermercado");
   let myquery = { _id: new ObjectId(req.body.id) }
@@ -463,7 +463,7 @@ recordRoutes.route("/Sales/confirm").post(cors(), function (req, res) {
 //------------
 
 //------SUPERMERCADO------
-recordRoutes.route("/Markets/get/all").get(cors(), function (req, res) {
+recordRoutes.route("/Markets/get/all").get( function (req, res) {
   let db_connect = dbo.getDb("supermercado");
   db_connect
     .collection("Supermercado")
