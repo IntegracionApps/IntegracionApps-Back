@@ -393,12 +393,13 @@ recordRoutes.route("/add").post( function (req, res) {
     pagoRealizado: req.body.values.pagoRealizado,
     vuelto: req.body.values.vuelto,
     estado: req.body.values.estado,
+    codigo_trackeo: req.body.values.codigo_trackeo,
     sucursal: req.body.values.sucursal,
     otros1: req.body.values.otros1,
     otros2: req.body.values.otros2,
   };
-  console.log(myobj.pagoRealizado);
-  console.log(myobj);
+  console.log(myobj.codigo_trackeo);
+  // console.log(myobj);
 
   myobj.items.forEach(item => {
     db_connect
